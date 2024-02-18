@@ -1,0 +1,1 @@
+docker run --detach --publish 3000:80 -e PORT=80 c0886437-assignment-3:latest
