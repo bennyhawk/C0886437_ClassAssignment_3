@@ -1,7 +1,8 @@
 pipeline {
   environment {
-    imagename = "bennyhawk/c0886437-assignment-4"
-    registryCredential = 'docker_registry_key_1'
+    imagename = "rdheepasri99/devops-assignment-jenkins-build:$BUILD_NUMBER"
+    imagenameECR = "436617760852.dkr.ecr.us-east-1.amazonaws.com/devops-assignment-jenkins-build:$BUILD_NUMBER"
+    registryCredential = 'Dheepasri_PAT'
     dockerImage = ''
   }
   agent any
@@ -25,6 +26,22 @@ pipeline {
           docker.withRegistry( '', registryCredential ) {
             dockerImage.push("$BUILD_NUMBER")
              dockerImage.push('latest')
+          }
+        }
+      }
+    }
+    stage('Building image for ECR') {
+      steps{
+        script {
+          dockerImage = docker.build imagenameECR
+        }
+      }
+    }
+    stage('Deploy to ECR') {
+      steps{
+        script {
+          docker.withRegistry("https://436617760852.dkr.ecr.us-east-1.amazonaws.com", "ecr:us-east-1:AWSECRCreds") {
+            docker.image(imagenameECR).push()
           }
         }
       }
